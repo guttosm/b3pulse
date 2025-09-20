@@ -1,0 +1,39 @@
+# ─── VCS ───────────────────────────────
+.git
+.gitignore
+
+# ─── Logs and build output ─────────────
+*.log
+*.out
+*.test
+*.exe
+
+# ─── Binaries ──────────────────────────
+b3pulse
+
+# ─── Go stuff ──────────────────────────
+vendor/
+pkg/
+coverage.out
+
+# ─── Env and config ────────────────────
+.env
+.env.*
+.envrc
+*.bak
+*.local
+
+# ─── Docker-related ────────────────────
+Dockerfile
+docker-compose.yml
+
+# ─── IDEs / Editors ────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# ─── OS trash ──────────────────────────
+.DS_Store
+Thumbs.db

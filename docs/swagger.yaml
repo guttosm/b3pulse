@@ -1,0 +1,91 @@
+basePath: /
+definitions:
+  github_com_guttosm_b3pulse_internal_domain_dto.AggregateResponse:
+    properties:
+      max_daily_volume:
+        description: Maximum daily traded volume in the period
+        example: 150000
+        type: integer
+      max_range_value:
+        description: Maximum price observed in the period
+        example: 20.5
+        type: number
+      ticker:
+        description: Stock ticker requested
+        example: PETR4
+        type: string
+    type: object
+  github_com_guttosm_b3pulse_internal_domain_dto.ErrorResponse:
+    properties:
+      error:
+        example: internal server error
+        type: string
+      message:
+        example: Something went wrong
+        type: string
+      timestamp:
+        example: 2025-08-02T15:04:05Z07:00
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: https://github.com/guttosm/b3pulse
+  description: B3 trade ingestion & aggregation service.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://github.com/guttosm/b3pulse
+  title: b3pulse API
+  version: "1.0"
+paths:
+  /api/v1/aggregate:
+    get:
+      consumes:
+      - application/json
+      description: Returns max price and max daily volume for the given ticker since
+        an optional start date
+      parameters:
+      - description: Stock ticker
+        example: PETR4
+        in: query
+        name: ticker
+        required: true
+        type: string
+      - description: Start date in YYYY-MM-DD
+        example: "2024-09-01"
+        in: query
+        name: data_inicio
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/github_com_guttosm_b3pulse_internal_domain_dto.AggregateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_guttosm_b3pulse_internal_domain_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_guttosm_b3pulse_internal_domain_dto.ErrorResponse'
+        "500":
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/github_com_guttosm_b3pulse_internal_domain_dto.ErrorResponse'
+      summary: Get aggregate by ticker
+      tags:
+      - aggregate
+schemes:
+- http
+swagger: "2.0"
+tags:
+- description: Endpoints for querying ticker aggregates
+  name: aggregate
+- description: Liveness and readiness probes
+  name: health

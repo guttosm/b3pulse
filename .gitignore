@@ -1,0 +1,46 @@
+# ─── Go build artifacts ─────────────────────────────
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.log
+
+# Binaries (adjust name to your actual built file)
+b3pulse
+
+
+# Coverage & test output
+*.cover
+coverage.out
+
+# Module cache & vendor folder (if not committed)
+vendor/
+
+# ─── Environment configs ────────────────────────────
+.env.*
+.envrc
+*.local
+*.bak
+
+# ─── IDEs / Editors ─────────────────────────────────
+# GoLand / IntelliJ
+.idea/
+# VSCode
+.vscode/
+# Others
+*.swp
+*.swo
+*.tmp
+
+# ─── OS Files ───────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Dependency checkers ────────────────────────────
+go.sum.tmp
+
+# ─── Local data & database state ───────────────────
+postgres-data/

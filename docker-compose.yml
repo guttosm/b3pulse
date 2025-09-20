@@ -1,0 +1,67 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: b3pulse-api
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      goose:
+        condition: service_completed_successfully
+
+  ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: b3pulse-ingest
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      goose:
+        condition: service_completed_successfully
+    profiles: ["ingest"]
+    command: ["--mode=ingest", "--dir=/app/data", "--days=7", "--parallel=7"]
+
+  goose:
+    image: golang:1.25-alpine
+    container_name: b3pulse-goose
+    working_dir: /migrations
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=host=postgres port=5432 user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD:-postgres} dbname=${POSTGRES_DB:-b3pulse} sslmode=disable
+    volumes:
+      - ./db/migrations:/migrations:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "go install github.com/pressly/goose/v3/cmd/goose@latest && goose -dir /migrations up"
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: b3pulse-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-b3pulse}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes: {}

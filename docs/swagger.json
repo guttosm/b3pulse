@@ -1,0 +1,132 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "B3 trade ingestion \u0026 aggregation service.",
+        "title": "b3pulse API",
+        "termsOfService": "https://github.com/guttosm/b3pulse",
+        "contact": {
+            "name": "API Support",
+            "url": "https://github.com/guttosm/b3pulse",
+            "email": "support@example.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/aggregate": {
+            "get": {
+                "description": "Returns max price and max daily volume for the given ticker since an optional start date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "aggregate"
+                ],
+                "summary": "Get aggregate by ticker",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "PETR4",
+                        "description": "Stock ticker",
+                        "name": "ticker",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-09-01",
+                        "description": "Start date in YYYY-MM-DD",
+                        "name": "data_inicio",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_guttosm_b3pulse_internal_domain_dto.AggregateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_guttosm_b3pulse_internal_domain_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_guttosm_b3pulse_internal_domain_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_guttosm_b3pulse_internal_domain_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_guttosm_b3pulse_internal_domain_dto.AggregateResponse": {
+            "type": "object",
+            "properties": {
+                "max_daily_volume": {
+                    "description": "Maximum daily traded volume in the period",
+                    "type": "integer",
+                    "example": 150000
+                },
+                "max_range_value": {
+                    "description": "Maximum price observed in the period",
+                    "type": "number",
+                    "example": 20.5
+                },
+                "ticker": {
+                    "description": "Stock ticker requested",
+                    "type": "string",
+                    "example": "PETR4"
+                }
+            }
+        },
+        "github_com_guttosm_b3pulse_internal_domain_dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "internal server error"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Something went wrong"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "2025-08-02T15:04:05Z07:00"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "description": "Endpoints for querying ticker aggregates",
+            "name": "aggregate"
+        },
+        {
+            "description": "Liveness and readiness probes",
+            "name": "health"
+        }
+    ]
+}
