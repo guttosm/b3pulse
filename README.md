@@ -4,13 +4,13 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=guttosm_b3pulse&metric=bugs)](https://sonarcloud.io/summary/new_code?id=guttosm_b3pulse)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=guttosm_b3pulse&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=guttosm_b3pulse)
 
-b3pulse is a Go service for ingesting B3 trade CSVs (stocks), persisting the relevant fields, and exposing a single REST endpoint that returns aggregates per ticker over a time window.
+b3pulse is a Go service for ingesting B3 trade TXT files (stocks), persisting the relevant fields, and exposing a single REST endpoint that returns aggregates per ticker over a time window.
 
 ---
 
 ## 🚀 Features
 
-- ⚡ Fast ingestion of the last 7 business days from CSV files (local directory)
+- ⚡ Fast ingestion of the last 7 business days from .txt files (local directory)
 - 🗃 PostgreSQL persistence with schema/migrations via Goose
 - 🔎 Single REST endpoint with filters:
   - ticker (required)
@@ -63,12 +63,65 @@ Swagger docs: <http://localhost:8080/swagger/index.html>
 
 ---
 
+## 📥 Before You Start: Prepare B3 TXT Files
+
+Before running any command, make sure the .txt files are downloaded, unzipped, and placed inside the project’s data folder.
+
+What you need
+
+- The B3 "Negócios à Vista" daily files for the last 7 business days, provided as .zip archives containing .txt files
+
+Steps
+
+1. Download the last 7 business-day files
+
+- Obtain the "Negócios à Vista" daily files from your internal source or the official B3 data portal.
+- You should end up with 7 .zip files, each corresponding to one business day.
+
+1. Unzip the archives
+
+- Extract each .zip so you get .txt files named like:
+
+```text
+DD-MM-YYYY_NEGOCIOSAVISTA.txt
+```
+
+1. Place the .txt files into the data folder
+
+- Move the extracted .txt files into the project at:
+
+```text
+./data
+```
+
+1. (Optional) Verify the expected filenames
+
+  ```bash
+  ls -1 ./data | sort | tail -n 7
+  ```
+
+  Example list:
+
+  ```text
+  11-09-2025_NEGOCIOSAVISTA.txt
+  12-09-2025_NEGOCIOSAVISTA.txt
+  15-09-2025_NEGOCIOSAVISTA.txt
+  16-09-2025_NEGOCIOSAVISTA.txt
+  17-09-2025_NEGOCIOSAVISTA.txt
+  18-09-2025_NEGOCIOSAVISTA.txt
+  19-09-2025_NEGOCIOSAVISTA.txt
+  ```
+
+With the files in place, you can now run ingestion or start the API.
+
 ### 🧪 Running Tests
 
 ```bash
 # Run unit + integration tests
 make test
+```
 
+```bash
 # Open HTML coverage report
 make coverage-html
 ```
@@ -119,16 +172,16 @@ make run-api
 # Fallback:
 go run ./cmd/main.go --mode=api --port=8080
 
-# Ingestion (requires CSVs under ./data/input)
+# Ingestion (requires TXT files under ./data)
 # Preferred (Docker Compose + Make):
 make docker-api-up   # ensures DB + migrations are ready
 make docker-ingest   # runs one-off ingestion (7 business days)
 
 # Local fallback (no Docker for app):
-go run ./cmd/main.go --mode=ingest --dir=./data/input --days=7 --parallel=7
+go run ./cmd/main.go --mode=ingest --dir=./data --days=7 --parallel=7
 
 # Force reingestion (delete and re-insert for days)
-go run ./cmd/main.go --mode=ingest --dir=./data/input --days=7 --parallel=7 --force
+go run ./cmd/main.go --mode=ingest --dir=./data --days=7 --parallel=7 --force
 ```
 
 ---
@@ -145,7 +198,7 @@ b3pulse/
 │   │   └── router.go          # Router setup
 │   ├── app/
 │   │   └── app.go             # Application wiring/orchestration
-│   ├── ingestion/             # CSV ingestion & parsing
+│   ├── ingestion/             # TXT ingestion & parsing
 │   ├── middleware/            # Middlewares (if any)
 │   └── storage/
 │       └── trade_repo.go      # Database access layer
